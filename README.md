@@ -1,126 +1,114 @@
-# 🚀 AI System Performance Tracker
+# AI Performance Tracker
 
-> **A Python CLI tool that monitors your PC's health and uses Google Gemini AI to deliver personalised performance optimisation advice — in seconds.**
+I built this because I was curious — what if my computer could just *tell me* what's slowing it down?
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)
-![Gemini](https://img.shields.io/badge/Powered%20by-Google%20Gemini-orange?logo=google)
-![License](https://img.shields.io/badge/License-MIT-green)
+This tool checks your CPU, RAM, and disk usage, grabs the top 10 processes eating your resources, and sends all of that to Google Gemini. The AI looks at it and gives you actual advice — like "close Brave, it's using 500MB of your RAM" or "your RAM is at 85%, here's what to do."
 
----
-
-## 📋 What It Does
-
-1. **Collects** real-time CPU, RAM, and Disk metrics using `psutil`
-2. **Identifies** the top 10 most resource-hungry processes
-3. **Sends** the data as JSON to the **Google Gemini API**
-4. **Displays** AI-generated, actionable optimisation advice in your terminal
-
-**No background monitoring. Runs once, shows results, exits cleanly.**
+No background monitoring. No data stored. You run it, it tells you what's up, and it exits.
 
 ---
 
-## 🖥️ Demo Output
+## What it does
 
-```
-🚀  AI System Performance Tracker
-────────────────────────────────────────────────
-Step 1/3 : Collecting system metrics... ✅
-Step 2/3 : Sending data to Gemini AI...  ✅
-Step 3/3 : Displaying AI recommendations...
+- Reads your system stats using `psutil` (CPU %, RAM, Disk, top 10 processes)
+- Bundles it into a JSON object
+- Sends it to the Gemini API
+- Prints the AI's advice in a clean terminal layout using `rich`
 
-🤖  AI Performance Analysis
-  Severity  : HIGH
-  Health    : 42/100
-  Your system is under heavy load — Chrome and Slack are consuming most of your RAM.
-
-📋 Recommendations
-  #1 [HIGH] Close unused Chrome tabs
-     Why   : Chrome is using 3.2 GB RAM across 12 processes
-     Saves : ~2.5 GB RAM freed
-```
+The whole thing runs in one shot — open terminal, type `python main.py`, done.
 
 ---
 
-## 🛠️ Tech Stack
+## Setup
 
-| Library | Purpose |
-|---------|---------|
-| `psutil` | System metrics (CPU, RAM, Disk, Processes) |
-| `google-generativeai` | Gemini API for AI-powered advice |
-| `rich` | Beautiful terminal output |
-| `python-dotenv` | Secure API key management |
-| `pytest` | Unit testing |
-
----
-
-## ⚙️ Setup & Installation
-
-### 1. Clone the Repository
+**1. Clone it**
 ```bash
-git clone https://github.com/YOUR_USERNAME/ai-performance-tracker.git
-cd ai-performance-tracker
+git clone https://github.com/sakshamtyagi767/AI-performance-tracker.git
+cd AI-performance-tracker
 ```
 
-### 2. Install Dependencies
+**2. Install dependencies**
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Configure Your API Key
-```bash
-# Copy the example file
-copy .env.example .env   # Windows
-cp .env.example .env     # Mac/Linux
+**3. Add your API key**
 
-# Open .env and paste your key:
-# GEMINI_API_KEY=your_actual_key_here
+Copy `.env.example` to `.env` and paste your Gemini API key inside:
 ```
-> Get a free API key at: https://aistudio.google.com/app/apikey
+GEMINI_API_KEY=your_key_here
+```
+Get a free key at [aistudio.google.com](https://aistudio.google.com/app/apikey)
 
-### 4. Run
+**4. Run it**
 ```bash
 python main.py
 ```
 
 ---
 
-## 🧪 Run Unit Tests
+## What the output looks like
+
+```
+AI System Performance Tracker
+────────────────────────────────────
+Step 1/3 : Collecting system metrics...
+Done! Metrics collected in 1.3s
+
+CPU   8.5%  |  4 cores
+RAM   6.6 GB used / 7.75 GB (85%)
+Disk  92 GB used / 328 GB (28%)
+
+Top 10 Processes
+1. Antigravity.exe   — 630 MB RAM
+2. MemCompression    — 450 MB RAM
+3. MsMpEng.exe       — 242 MB RAM
+...
+
+Step 2/3 : Sending to Gemini AI...
+
+Severity : MEDIUM  |  Health Score: 75/100
+"System under moderate load, mostly from RAM usage"
+
+Recommendations:
+  [HIGH]   Close unused Brave tabs — saves ~500 MB RAM
+  [MEDIUM] Adjust MemCompression  — saves ~50 MB RAM
+  [LOW]    Monitor CPU core imbalance
+```
+
+---
+
+## Running the tests
 
 ```bash
 pytest tests/ -v
 ```
 
+21 tests, all passing. They check that psutil returns valid data — correct types, sane ranges, JSON-serializable output before anything gets sent to the API.
+
 ---
 
-## 📁 Project Structure
+## Files
 
 ```
 ai-performance-tracker/
-│
-├── main.py          # Entry point — orchestrates the pipeline
-├── monitor.py       # psutil-based system metrics collector
-├── ai_advisor.py    # Gemini API integration + response parser
-├── reporter.py      # Rich terminal display module
-├── config.py        # Settings & secure API key loader
-│
+├── main.py          # runs everything in order
+├── monitor.py       # collects system stats with psutil
+├── ai_advisor.py    # sends data to Gemini, parses response
+├── reporter.py      # prints everything nicely in the terminal
+├── config.py        # loads API key from .env
 ├── tests/
-│   └── test_monitor.py  # Unit tests for monitor module
-│
-├── requirements.txt
-├── .env.example     # Safe to commit — template only
-├── .gitignore       # Keeps .env and __pycache__ out of git
-└── README.md
+│   └── test_monitor.py
+├── .env.example     # copy this to .env and add your key
+└── requirements.txt
 ```
 
 ---
 
-## 🔒 Security Note
+## Note on the API key
 
-Your API key is stored in a `.env` file which is listed in `.gitignore`.
-**It will never be committed to GitHub.** The `.env.example` file (which is safe to commit) shows the format.
+The `.env` file is in `.gitignore` so it will never be committed to GitHub. The `.env.example` is safe to commit — it's just a template with no real key in it.
 
 ---
 
-## 📄 License
-
-MIT License — feel free to use, modify, and share.
+Built with Python 3.12 · psutil · google-genai · rich · python-dotenv
