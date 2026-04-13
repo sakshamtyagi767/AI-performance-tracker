@@ -99,7 +99,6 @@ ai-performance-tracker/
 ├── config.py        # loads API key from .env
 ├── tests/
 │   └── test_monitor.py
-├── .env.example     # copy this to .env and add your key
 └── requirements.txt
 ```
 
